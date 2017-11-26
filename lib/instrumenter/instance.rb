@@ -7,7 +7,7 @@ module Instrumenter
     end
 
     def log_event(message)
-      event = {request_id: instance.request_id, message: message}.to_json
+      event = {request_id: request_id, message: message}.to_json
       Rails.logger.info event
     end
   end

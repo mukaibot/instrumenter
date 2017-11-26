@@ -8,7 +8,7 @@ module Instrumenter
   class << self
 
     def setup(env)
-      request_id = ActionDispatch::Request.new(env).headers.fetch("HTTP_X_REQUEST_ID", SecureRandom.uuid)
+      request_id = env.fetch("HTTP_X_REQUEST_ID", SecureRandom.uuid)
       instrumenter = Instrumenter::Instance.new(request_id)
       Thread.current[THREAD_VARIABLE_NAME] = instrumenter
       instrumenter
