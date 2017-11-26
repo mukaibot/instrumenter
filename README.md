@@ -4,7 +4,7 @@ Instrumenter is a small gem that was created to allow logging with a single requ
 
 1. CDN edge generates a request id (setting the `X-Request-Id` header)
 1. The request goes to your first Rack microservice, which is a Rails app
-1. The Rails app then calls another microservice. You add `Instrument.log_event(message)` around your call to the second service, and set the `X-Request-Id` header on the call to the second service to the value of `Instrumenter.instance.request_id`
+1. The Rails app then calls another microservice. You add `Instrumenter.log_event(message)` around your call to the second service, and set the `X-Request-Id` header on the call to the second service to the value of `Instrumenter.instance.request_id`
 1. The second service receives the same value for `X-Request-Id` that was generated at the edge
 1. The second (and any subsequent services) can continue to easily pass the same `X-Request-Id` header around, allowing you to trace a single request through multiple backends in your logs
 
@@ -26,7 +26,50 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Usage with Rack apps
+1. Load the Rack middleware
+```$ruby
+require 'instrumenter/instrumenter_middleware'
+use Instrumenter::InstrumenterMiddleware
+```
+
+2. Use it in calls to internal services
+
+```$ruby
+HTTParty.get(url, headers: { 'X-Request-Id': Instrumenter.instance.request_id })
+```
+
+### Usage with Rails apps
+[Lograge](https://github.com/roidrage/lograge) is recommended to get the most out of your logs on Rails
+
+1. Load the Rack middleware in an initializer
+```$ruby
+require 'instrumenter/instrumenter_middleware'
+
+Rails.configuration.middleware.tap do |rack|
+  rack.use Instrumenter::InstrumenterMiddleware
+end
+```
+
+2. Configure logging in environment / application.rb
+
+```$ruby
+module YourApp
+  class Application < Rails::Application
+    config.lograge.enabled = true
+    config.lograge.formatter = Lograge::Formatters::Json.new
+    config.lograge.custom_options = lambda do |event|
+      { request_id: Instrumenter.instance.request_id }
+    end
+  end
+end
+```
+
+3. Use it in calls to internal services
+
+```$ruby
+HTTParty.get(url, headers: { 'X-Request-Id': Instrumenter.instance.request_id })
+```
 
 ## Development
 
