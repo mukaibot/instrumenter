@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "instrumenter"
   spec.version       = Instrumenter::VERSION
   spec.authors       = ["Timothy Mukaibo"]
-  spec.email         = ["timothy.mukaibo@rea-group.com"]
+  spec.email         = ["timothy.mukaibo@gmail.com"]
 
   spec.summary       = "Easily add instrumentation to your Rails app"
   spec.homepage      = "https://github.com/mukaibot/instrumenter"
